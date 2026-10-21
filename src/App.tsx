@@ -104,7 +104,7 @@ export default function App() {
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-850 hover:bg-zinc-800 text-zinc-300 text-xs font-semibold border border-zinc-700 transition"
             >
               <Code2 size={13} className="text-cyan-400" />
-              <span>Inspect All Files (10)</span>
+              <span>Inspect All Files (11)</span>
             </button>
           </div>
 

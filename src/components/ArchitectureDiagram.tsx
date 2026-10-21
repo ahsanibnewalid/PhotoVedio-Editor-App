@@ -39,7 +39,7 @@ export const ArchitectureDiagram: React.FC = () => {
               <HardDrive size={16} />
             </div>
             <span className="text-[11px] font-bold text-white">Media Asset</span>
-            <span className="text-[10px] text-zinc-500 font-mono mt-0.5">MP4 / HEVC / SAF</span>
+            <span className="text-[10px] text-zinc-500 font-mono mt-0.5">MP4 / SAF / Scoped</span>
           </div>
 
           <div className="hidden md:flex justify-center text-zinc-600">
@@ -52,7 +52,7 @@ export const ArchitectureDiagram: React.FC = () => {
               <Cpu size={16} />
             </div>
             <span className="text-[11px] font-bold text-white">MediaCodec Decoder</span>
-            <span className="text-[10px] text-cyan-400 font-mono mt-0.5">ExoPlayer Surface</span>
+            <span className="text-[10px] text-cyan-400 font-mono mt-0.5">SurfaceTexture OES</span>
           </div>
 
           <div className="hidden md:flex justify-center text-zinc-600">
@@ -64,8 +64,8 @@ export const ArchitectureDiagram: React.FC = () => {
             <div className="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-300 flex items-center justify-center mb-2">
               <Flame size={16} />
             </div>
-            <span className="text-[11px] font-bold text-cyan-300">Skia GPU Shaders</span>
-            <span className="text-[10px] text-cyan-400 font-mono mt-0.5">SkSL Real-time 60FPS</span>
+            <span className="text-[11px] font-bold text-cyan-300">Skia GPU & ML Kit</span>
+            <span className="text-[10px] text-cyan-400 font-mono mt-0.5">3D LUTs + NPU Cutout</span>
           </div>
 
           <div className="hidden md:flex justify-center text-zinc-600">
@@ -77,8 +77,8 @@ export const ArchitectureDiagram: React.FC = () => {
             <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mb-2">
               <Layers size={16} />
             </div>
-            <span className="text-[11px] font-bold text-white">Reanimated Timeline</span>
-            <span className="text-[10px] text-amber-400 font-mono mt-0.5">Native UI Thread</span>
+            <span className="text-[11px] font-bold text-white">4-Track Timeline</span>
+            <span className="text-[10px] text-amber-400 font-mono mt-0.5">Reanimated 3 (60 FPS)</span>
           </div>
 
           <div className="hidden md:flex justify-center text-zinc-600">
@@ -90,14 +90,14 @@ export const ArchitectureDiagram: React.FC = () => {
             <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/30 text-purple-400 flex items-center justify-center mb-2">
               <Zap size={16} />
             </div>
-            <span className="text-[11px] font-bold text-white">MediaCodec HW Mux</span>
-            <span className="text-[10px] text-purple-400 font-mono mt-0.5">18 Mbps 1080p 60fps</span>
+            <span className="text-[11px] font-bold text-white">FFmpeg MediaCodec</span>
+            <span className="text-[10px] text-purple-400 font-mono mt-0.5">-c:v h264_mediacodec</span>
           </div>
 
         </div>
       </div>
 
-      {/* 2. THREE PILLARS SPECIFICATIONS */}
+      {/* 2. CORE ARCHITECTURAL PILLARS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         
         {/* Pillar 1 */}
@@ -107,21 +107,21 @@ export const ArchitectureDiagram: React.FC = () => {
               <Cpu size={16} />
             </div>
             <h4 className="text-xs font-bold uppercase text-white tracking-wider">
-              1. Hardware Decoding & Skia
+              1. Skia GPU & 3D LUTs
             </h4>
           </div>
           <ul className="space-y-2 text-xs text-zinc-400 leading-normal">
             <li className="flex items-start gap-1.5">
               <CheckCircle2 size={13} className="text-cyan-400 mt-0.5 shrink-0" />
-              <span>Uses Android <code>SurfaceView</code> and <code>useTextureView=true</code> to avoid Android bitmap copying.</span>
+              <span>Uses Android <code>SurfaceView</code> and <code>useTextureView=true</code> to avoid bitmap allocations.</span>
             </li>
             <li className="flex items-start gap-1.5">
               <CheckCircle2 size={13} className="text-cyan-400 mt-0.5 shrink-0" />
-              <span>Compiles SkSL shaders directly on Adreno/Mali GPUs via <code>@shopify/react-native-skia</code>.</span>
+              <span>Compiles SkSL fragment shaders for Teal & Orange 3D LUTs, film grain, and neon blooms.</span>
             </li>
             <li className="flex items-start gap-1.5">
               <CheckCircle2 size={13} className="text-cyan-400 mt-0.5 shrink-0" />
-              <span>Color matrices for Grayscale and Sepia execute with 0ms frame drops.</span>
+              <span>One-tap Auto Cinematic Grade with optical vignette and 2.39:1 anamorphic bars.</span>
             </li>
           </ul>
         </div>
@@ -133,21 +133,21 @@ export const ArchitectureDiagram: React.FC = () => {
               <Zap size={16} />
             </div>
             <h4 className="text-xs font-bold uppercase text-white tracking-wider">
-              2. 60 FPS Reanimated Engine
+              2. On-Device AI Segmentation
             </h4>
           </div>
           <ul className="space-y-2 text-xs text-zinc-400 leading-normal">
             <li className="flex items-start gap-1.5">
               <CheckCircle2 size={13} className="text-amber-400 mt-0.5 shrink-0" />
-              <span><code>PanGestureHandler</code> dispatches touch events directly on the Android UI Thread via worklets.</span>
+              <span>100% offline Google ML Kit Subject Segmentation running on device NPU/GPU.</span>
             </li>
             <li className="flex items-start gap-1.5">
               <CheckCircle2 size={13} className="text-amber-400 mt-0.5 shrink-0" />
-              <span>Zero JS bridge roundtrips during playhead scrubbing and timeline pinch-to-zoom.</span>
+              <span>Layer sandwiching: allows text overlay placement <em>behind</em> the segmented subject.</span>
             </li>
             <li className="flex items-start gap-1.5">
               <CheckCircle2 size={13} className="text-amber-400 mt-0.5 shrink-0" />
-              <span>Synchronous seek requests throttled with <code>runOnJS</code> callbacks.</span>
+              <span>Custom depth-of-field background blur layer behind isolated human subjects.</span>
             </li>
           </ul>
         </div>
@@ -159,21 +159,21 @@ export const ArchitectureDiagram: React.FC = () => {
               <ShieldCheck size={16} />
             </div>
             <h4 className="text-xs font-bold uppercase text-white tracking-wider">
-              3. Android 13+ Scoped Storage
+              3. FFmpeg MediaCodec Export
             </h4>
           </div>
           <ul className="space-y-2 text-xs text-zinc-400 leading-normal">
             <li className="flex items-start gap-1.5">
               <CheckCircle2 size={13} className="text-emerald-400 mt-0.5 shrink-0" />
-              <span>Integrated with Android Photo Picker for zero-permission user video selection.</span>
+              <span>Executes <code>-c:v h264_mediacodec</code> with zero RAM frame copies at 18-35 Mbps.</span>
             </li>
             <li className="flex items-start gap-1.5">
               <CheckCircle2 size={13} className="text-emerald-400 mt-0.5 shrink-0" />
-              <span>Direct <code>content://</code> URI resolution via Android MediaStore and MediaMuxer.</span>
+              <span>Presets for Instagram Reels (1080p 60fps), YouTube Long-form, and 4K masters.</span>
             </li>
             <li className="flex items-start gap-1.5">
               <CheckCircle2 size={13} className="text-emerald-400 mt-0.5 shrink-0" />
-              <span>Clean Gradle <code>pickFirst</code> packaging rules resolving NDK <code>.so</code> conflicts.</span>
+              <span>Android 13+ Scoped Storage compliance writing directly to Movies directory.</span>
             </li>
           </ul>
         </div>

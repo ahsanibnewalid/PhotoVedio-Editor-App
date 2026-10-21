@@ -1,6 +1,20 @@
 import React, { useRef, useState } from 'react';
-import { Film, Music, Type, ZoomIn, ZoomOut, Scissors, Volume2, VolumeX } from 'lucide-react';
-import { VideoClipSegment, TextOverlayItem } from '../types/editor';
+import { 
+  Film, 
+  Music, 
+  Type, 
+  ZoomIn, 
+  ZoomOut, 
+  Scissors, 
+  Volume2, 
+  VolumeX,
+  Sparkles,
+  Layers,
+  Sliders,
+  Eye,
+  EyeOff
+} from 'lucide-react';
+import { VideoClipSegment, TextOverlayItem, OverlayCutoutItem, AudioTrackItem } from '../types/editor';
 
 interface InteractiveTimelineProps {
   currentTime: number;
@@ -8,6 +22,8 @@ interface InteractiveTimelineProps {
   onSeek: (time: number) => void;
   videoClips: VideoClipSegment[];
   textOverlays: TextOverlayItem[];
+  overlayCutouts: OverlayCutoutItem[];
+  audioTrack: AudioTrackItem;
   selectedClipId: string | null;
   onSelectClip: (clipId: string) => void;
   onSplitClip: () => void;
@@ -21,6 +37,8 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({
   onSeek,
   videoClips,
   textOverlays,
+  overlayCutouts,
+  audioTrack,
   selectedClipId,
   onSelectClip,
   onSplitClip,
@@ -34,7 +52,7 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({
   // Dynamic pixels per second based on zoom level
   const basePixelsPerSec = 44;
   const pixelsPerSec = basePixelsPerSec * zoomLevel;
-  const timelineContentWidth = Math.max(600, totalDuration * pixelsPerSec + 120);
+  const timelineContentWidth = Math.max(650, totalDuration * pixelsPerSec + 140);
 
   // Playhead position in px
   const playheadLeftPx = currentTime * pixelsPerSec;
@@ -58,8 +76,8 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const scrollLeft = containerRef.current.scrollLeft;
-    // Account for 64px track label header
-    const clickX = e.clientX - rect.left + scrollLeft - 64;
+    // Account for 76px track label header
+    const clickX = e.clientX - rect.left + scrollLeft - 76;
     const newTime = Math.max(0, Math.min(totalDuration, clickX / pixelsPerSec));
     onSeek(newTime);
   };
@@ -77,7 +95,7 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({
       <div className="flex items-center justify-between px-3 py-1.5 bg-[#09090b] border-b border-zinc-800/80">
         <div className="flex items-center gap-2">
           <span className="text-[10px] uppercase font-bold tracking-wider text-zinc-400">
-            Multi-Track Timeline
+            4-Track Native Timeline
           </span>
           <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-cyan-400 font-semibold border border-cyan-500/20">
             {currentTime.toFixed(2)}s / {totalDuration.toFixed(1)}s
@@ -129,32 +147,53 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({
         </div>
       </div>
 
-      {/* Main Tracks Container with Scroll */}
+      {/* Main 4-Tracks Container with Scroll */}
       <div 
         ref={containerRef}
-        className="relative overflow-x-auto overflow-y-hidden cursor-crosshair h-44 flex"
+        className="relative overflow-x-auto overflow-y-hidden cursor-crosshair h-56 flex"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
       >
-        {/* Left Fixed Track Type Badges */}
-        <div className="sticky left-0 z-30 w-16 bg-[#09090b]/95 backdrop-blur-sm border-r border-zinc-800 flex flex-col shrink-0">
+        {/* Left Fixed 4-Track Header Badges */}
+        <div className="sticky left-0 z-30 w-20 bg-[#09090b]/95 backdrop-blur-sm border-r border-zinc-800 flex flex-col shrink-0">
           <div className="h-6 border-b border-zinc-800/80 flex items-center justify-center text-[10px] font-mono text-zinc-500">
-            TC
+            TC RULER
           </div>
-          {/* Video track badge */}
-          <div className="h-12 border-b border-zinc-800/50 flex flex-col items-center justify-center gap-0.5 text-zinc-400 px-1">
-            <Film size={12} className="text-cyan-400" />
-            <span className="text-[9px] font-semibold tracking-tight">VIDEO</span>
+
+          {/* Track 1: Text */}
+          <div className="h-10 border-b border-zinc-800/50 flex flex-col items-center justify-center gap-0.5 text-zinc-400 px-1 bg-amber-950/5">
+            <div className="flex items-center gap-1">
+              <Type size={11} className="text-amber-400" />
+              <span className="text-[9px] font-bold tracking-tight">T1: TEXT</span>
+            </div>
+            <span className="text-[8px] text-zinc-500 font-mono">Subtitles</span>
           </div>
-          {/* Audio track badge */}
-          <div className="h-10 border-b border-zinc-800/50 flex flex-col items-center justify-center gap-0.5 text-zinc-400 px-1">
-            <Music size={12} className="text-emerald-400" />
-            <span className="text-[9px] font-semibold tracking-tight">AUDIO</span>
+
+          {/* Track 2: Overlay / AI Cutout */}
+          <div className="h-11 border-b border-zinc-800/50 flex flex-col items-center justify-center gap-0.5 text-zinc-400 px-1 bg-cyan-950/10">
+            <div className="flex items-center gap-1">
+              <Sparkles size={11} className="text-cyan-400" />
+              <span className="text-[9px] font-bold tracking-tight">T2: CUTOUT</span>
+            </div>
+            <span className="text-[8px] text-cyan-400/80 font-mono">ML Kit NPU</span>
           </div>
-          {/* Text track badge */}
-          <div className="h-9 flex flex-col items-center justify-center gap-0.5 text-zinc-400 px-1">
-            <Type size={12} className="text-amber-400" />
-            <span className="text-[9px] font-semibold tracking-tight">TEXT</span>
+
+          {/* Track 3: Video Clips */}
+          <div className="h-13 border-b border-zinc-800/50 flex flex-col items-center justify-center gap-0.5 text-zinc-400 px-1 bg-blue-950/10">
+            <div className="flex items-center gap-1">
+              <Film size={11} className="text-blue-400" />
+              <span className="text-[9px] font-bold tracking-tight">T3: VIDEO</span>
+            </div>
+            <span className="text-[8px] text-zinc-500 font-mono">MediaCodec</span>
+          </div>
+
+          {/* Track 4: Audio Mixer */}
+          <div className="h-11 flex flex-col items-center justify-center gap-0.5 text-zinc-400 px-1 bg-emerald-950/10">
+            <div className="flex items-center gap-1">
+              <Music size={11} className="text-emerald-400" />
+              <span className="text-[9px] font-bold tracking-tight">T4: AUDIO</span>
+            </div>
+            <span className="text-[8px] text-emerald-400/80 font-mono">Mixer • Fade</span>
           </div>
         </div>
 
@@ -175,7 +214,6 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({
                 <span className="text-[9px] font-mono text-zinc-500 -ml-1 mt-0.5">
                   {sec}s
                 </span>
-                {/* 0.5s sub-tick */}
                 {sec < totalDuration && (
                   <div
                     className="absolute top-0 w-px h-1.5 bg-zinc-700/80"
@@ -186,10 +224,79 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({
             ))}
           </div>
 
-          {/* TRACK 1: VIDEO TRACK */}
-          <div className="h-12 border-b border-zinc-800/40 relative flex items-center px-1 bg-zinc-950/20">
+          {/* TRACK 1: TEXT / SUBTITLES TRACK */}
+          <div className="h-10 border-b border-zinc-800/40 relative flex items-center px-1 bg-amber-950/5">
+            {textOverlays.map((txt) => {
+              const textLeft = txt.startTime * pixelsPerSec;
+              const textWidth = Math.max(44, (txt.endTime - txt.startTime) * pixelsPerSec);
+
+              return (
+                <div
+                  key={txt.id}
+                  className="absolute h-7 rounded bg-amber-950/40 border border-amber-500/50 flex items-center justify-between px-2 gap-1 overflow-hidden hover:border-amber-400 transition"
+                  style={{
+                    left: `${textLeft}px`,
+                    width: `${textWidth}px`,
+                  }}
+                >
+                  <div className="flex items-center gap-1 truncate">
+                    <Type size={10} className="text-amber-400 shrink-0" />
+                    <span className="text-[10px] font-semibold text-amber-200 truncate font-mono">
+                      "{txt.text}"
+                    </span>
+                  </div>
+                  <span className="text-[8px] font-mono px-1 py-0.2 rounded bg-amber-900/60 text-amber-300 shrink-0">
+                    {txt.layerPosition === 'BEHIND_SUBJECT' ? 'Behind Subject' : 'Top'}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* TRACK 2: OVERLAY / AI CUTOUT / STICKER TRACK */}
+          <div className="h-11 border-b border-zinc-800/40 relative flex items-center px-1 bg-cyan-950/10">
+            {overlayCutouts.map((cutout) => {
+              const cutoutLeft = cutout.startTime * pixelsPerSec;
+              const cutoutWidth = Math.max(60, (cutout.endTime - cutout.startTime) * pixelsPerSec);
+
+              return (
+                <div
+                  key={cutout.id}
+                  className={`absolute h-8 rounded-md border flex items-center justify-between px-2 gap-1 overflow-hidden transition ${
+                    cutout.maskActive
+                      ? 'bg-cyan-950/40 border-cyan-400 shadow-[0_0_10px_rgba(0,242,254,0.2)]'
+                      : 'bg-zinc-900 border-zinc-700 opacity-70'
+                  }`}
+                  style={{
+                    left: `${cutoutLeft}px`,
+                    width: `${cutoutWidth}px`,
+                  }}
+                >
+                  <div className="flex items-center gap-1.5 truncate">
+                    <Sparkles size={11} className="text-cyan-400 shrink-0" />
+                    <span className="text-[10px] font-bold text-cyan-200 truncate font-mono">
+                      {cutout.name}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {cutout.depthOfFieldBlur > 0 && (
+                      <span className="text-[8px] px-1 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono">
+                        DoF: {cutout.depthOfFieldBlur}px
+                      </span>
+                    )}
+                    <span className="text-[8px] px-1 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono font-bold">
+                      AI MASK
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* TRACK 3: MAIN VIDEO TRACK */}
+          <div className="h-13 border-b border-zinc-800/40 relative flex items-center px-1 bg-blue-950/10">
             {videoClips.map((clip) => {
-              const clipWidth = Math.max(36, clip.duration * pixelsPerSec);
+              const clipWidth = Math.max(40, clip.duration * pixelsPerSec);
               const clipLeft = clip.startTime * pixelsPerSec;
               const isSelected = selectedClipId === clip.id;
 
@@ -202,83 +309,88 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({
                   }}
                   className={`absolute h-10 rounded-md overflow-hidden flex items-center transition-all cursor-pointer ${
                     isSelected
-                      ? 'ring-2 ring-cyan-400 bg-zinc-900 shadow-md shadow-cyan-900/30'
+                      ? 'ring-2 ring-blue-400 bg-zinc-900 shadow-md shadow-blue-900/30'
                       : 'bg-zinc-850 hover:bg-zinc-800 border border-zinc-700/60'
                   }`}
                   style={{
                     left: `${clipLeft}px`,
                     width: `${clipWidth}px`,
-                    backgroundColor: isSelected ? '#18242b' : '#18181f',
+                    backgroundColor: isSelected ? '#152238' : '#18181f',
                   }}
                 >
-                  {/* Left Trim Handle */}
-                  <div className="w-1.5 h-full bg-cyan-400 hover:w-2 transition-all cursor-ew-resize shrink-0" />
+                  <div className="w-1.5 h-full bg-blue-400 hover:w-2 transition-all cursor-ew-resize shrink-0" />
 
-                  {/* Clip Strip Interior & Frame Mock */}
                   <div className="flex-1 h-full px-2 flex items-center justify-between overflow-hidden gap-1">
                     <div className="flex items-center gap-1.5 truncate">
-                      <Film size={11} className="text-cyan-400 shrink-0" />
+                      <Film size={11} className="text-blue-400 shrink-0" />
                       <span className="text-[10px] font-semibold text-zinc-200 truncate">
                         {clip.name}
                       </span>
                     </div>
-                    <span className="text-[9px] font-mono text-cyan-300/70 shrink-0">
+                    <span className="text-[9px] font-mono text-blue-300/70 shrink-0">
                       {clip.duration.toFixed(1)}s
                     </span>
                   </div>
 
-                  {/* Right Trim Handle */}
-                  <div className="w-1.5 h-full bg-cyan-400 hover:w-2 transition-all cursor-ew-resize shrink-0" />
+                  <div className="w-1.5 h-full bg-blue-400 hover:w-2 transition-all cursor-ew-resize shrink-0" />
                 </div>
               );
             })}
           </div>
 
-          {/* TRACK 2: AUDIO WAVEFORM TRACK */}
-          <div className="h-10 border-b border-zinc-800/40 relative flex items-center px-1 bg-emerald-950/10">
+          {/* TRACK 4: AUDIO MIXER TRACK */}
+          <div className="h-11 relative flex items-center px-1 bg-emerald-950/10">
             <div 
-              className="h-8 rounded bg-emerald-950/30 border border-emerald-500/30 flex items-center px-2 gap-1 overflow-hidden"
+              className="h-8 rounded bg-emerald-950/30 border border-emerald-500/30 flex items-center justify-between px-2 gap-1 overflow-hidden relative"
               style={{ width: `${totalDuration * pixelsPerSec}px` }}
             >
-              <Music size={11} className="text-emerald-400 shrink-0 mr-1" />
-              {/* Animated / Simulated Audio Waveform Bars */}
-              {Array.from({ length: Math.floor((totalDuration * pixelsPerSec) / 7) }).map((_, i) => {
-                const heightPct = 25 + Math.sin(i * 0.5) * 45 + ((i % 4) * 8);
-                return (
-                  <div
-                    key={i}
-                    className={`w-1 rounded-sm shrink-0 transition-all ${
-                      isAudioMuted ? 'bg-zinc-600 h-1.5' : 'bg-emerald-400'
-                    }`}
-                    style={{ height: `${isAudioMuted ? 4 : Math.min(24, Math.max(4, heightPct * 0.28))}px` }}
-                  />
-                );
-              })}
-            </div>
-          </div>
-
-          {/* TRACK 3: TEXT / SUBTITLE OVERLAY TRACK */}
-          <div className="h-9 relative flex items-center px-1 bg-amber-950/10">
-            {textOverlays.map((txt) => {
-              const textLeft = txt.startTime * pixelsPerSec;
-              const textWidth = Math.max(44, (txt.endTime - txt.startTime) * pixelsPerSec);
-
-              return (
-                <div
-                  key={txt.id}
-                  className="absolute h-7 rounded bg-amber-950/40 border border-amber-500/50 flex items-center px-2 gap-1 overflow-hidden hover:border-amber-400 transition"
-                  style={{
-                    left: `${textLeft}px`,
-                    width: `${textWidth}px`,
-                  }}
+              {/* Fade-in visual ramp */}
+              {audioTrack.fadeInSeconds > 0 && (
+                <div 
+                  className="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-black/80 to-transparent pointer-events-none z-10 border-r border-emerald-400/40"
+                  style={{ width: `${audioTrack.fadeInSeconds * pixelsPerSec}px` }}
                 >
-                  <Type size={11} className="text-amber-400 shrink-0" />
-                  <span className="text-[10px] font-semibold text-amber-200 truncate font-mono">
-                    "{txt.text}"
+                  <span className="text-[8px] font-mono text-emerald-300 pl-1">
+                    +{audioTrack.fadeInSeconds}s Fade
                   </span>
                 </div>
-              );
-            })}
+              )}
+
+              <div className="flex items-center gap-1.5 shrink-0 z-10">
+                <Music size={11} className="text-emerald-400 shrink-0 mr-1" />
+                <span className="text-[9px] font-bold text-emerald-300 font-mono">
+                  {audioTrack.title} ({(audioTrack.volume * 100).toFixed(0)}%)
+                </span>
+              </div>
+
+              {/* Animated / Simulated Audio Waveform Bars */}
+              <div className="flex items-center gap-1 overflow-hidden flex-1 mx-2">
+                {Array.from({ length: Math.floor((totalDuration * pixelsPerSec) / 8) }).map((_, i) => {
+                  const heightPct = 25 + Math.sin(i * 0.5) * 45 + ((i % 4) * 8);
+                  return (
+                    <div
+                      key={i}
+                      className={`w-1 rounded-sm shrink-0 transition-all ${
+                        isAudioMuted ? 'bg-zinc-600 h-1.5' : 'bg-emerald-400'
+                      }`}
+                      style={{ height: `${isAudioMuted ? 4 : Math.min(22, Math.max(4, heightPct * 0.28 * audioTrack.volume))}px` }}
+                    />
+                  );
+                })}
+              </div>
+
+              {/* Fade-out visual ramp */}
+              {audioTrack.fadeOutSeconds > 0 && (
+                <div 
+                  className="absolute right-0 top-0 bottom-0 bg-gradient-to-l from-black/80 to-transparent pointer-events-none z-10 border-l border-emerald-400/40"
+                  style={{ width: `${audioTrack.fadeOutSeconds * pixelsPerSec}px` }}
+                >
+                  <span className="text-[8px] font-mono text-emerald-300 pr-1 text-right block">
+                    -{audioTrack.fadeOutSeconds}s Fade
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* FIXED / SYNCHRONIZED PLAYHEAD NEEDLE */}
@@ -289,9 +401,7 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({
               transform: 'translateX(-50%)',
             }}
           >
-            {/* Playhead Marker Needle Head */}
             <div className="w-3.5 h-3.5 bg-cyan-400 rounded-sm rotate-45 shadow-[0_0_10px_#00f2fe] border border-white/60 -mt-0.5" />
-            {/* Vertical Laser Line */}
             <div className="w-0.5 flex-1 bg-cyan-400 shadow-[0_0_8px_#00f2fe]" />
           </div>
         </div>
